@@ -26,28 +26,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      final authProvider = context.read<AuthProvider>();
-      final loginProvider = context.read<LoginProvider>();
 
-      final success = await authProvider.login(
-        loginProvider.usernameController.text.trim(),
-        loginProvider.passwordController.text,
-      );
-
-      if (success && mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const DashboardScreen()),
         );
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? 'Login failed'),
-            backgroundColor: AppTheme.red,
-          ),
-        );
-      }
-    }
+
   }
 
   @override
