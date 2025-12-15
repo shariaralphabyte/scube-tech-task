@@ -12,6 +12,7 @@ import '../widgets/circular_progress_widget.dart';
 import '../widgets/data_source_card.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/data_item_widget.dart';
+import 'no_data_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -437,37 +438,79 @@ class _DashboardScreenState extends State<DashboardScreen>
         crossAxisCount: 2,
         crossAxisSpacing: 16.h,
         mainAxisSpacing: 16.h,
-        childAspectRatio: 3.5,
+        childAspectRatio: 2.8,
         children: [
           ShortcutItemWidget(
             title: 'Analysis Pro',
             iconPath: 'assets/chart.png',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NoData(),
+                ),
+              );
+            },
           ),
           ShortcutItemWidget(
             title: 'G. Generator',
             iconPath: 'assets/generator.png',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NoData(),
+                ),
+              );
+            },
           ),
           ShortcutItemWidget(
             title: 'Plant Summary',
             iconPath: 'assets/charge.png',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NoData(),
+                ),
+              );
+            },
           ),
           ShortcutItemWidget(
             title: 'Natural Gas',
             iconPath: 'assets/fire.png',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NoData(),
+                ),
+              );
+            },
           ),
           ShortcutItemWidget(
             title: 'D. Generator',
             iconPath: 'assets/generator.png',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NoData(),
+                ),
+              );
+            },
           ),
           ShortcutItemWidget(
             title: 'Water Process',
             iconPath: 'assets/faucet.png',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NoData(),
+                ),
+              );
+            },
           ),
         ],
       ),
