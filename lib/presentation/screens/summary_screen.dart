@@ -5,6 +5,7 @@ import '../../core/constants/app_constants.dart';
 import '../providers/energy_provider.dart';
 import '../widgets/circular_progress_widget.dart';
 import '../widgets/energy_chart_card.dart';
+import '../widgets/semi_circular_progress_widget.dart';
 import 'custom_date_screen.dart';
 
 class SummaryScreen extends StatefulWidget {
@@ -227,7 +228,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                 // Circular Progress
                 CircularProgressWidget(
                   value: data.energyPerSqft,
-                  maxValue: 100,
+                  maxValue: 1,
                   unit: AppConstants.energyUnit,
                   size: 160,
                 ),
@@ -275,14 +276,14 @@ class _SummaryScreenState extends State<SummaryScreen>
               children: [
                 const SizedBox(height: 16),
                 // Revenue Display
-                CircularProgressWidget(
+                SemiCircularProgressWidget(
                   value: totalRevenue / 100000,
-                  maxValue: 100,
+                  maxValue: 1,
                   unit: '৳',
-                  size: 160,
+                  width: 160,
+                  height: 80,
                 ),
-                const SizedBox(height: 24),
-                _buildDataToggle(),
+
                 const SizedBox(height: 16),
                 // Revenue breakdown
                 Card(
