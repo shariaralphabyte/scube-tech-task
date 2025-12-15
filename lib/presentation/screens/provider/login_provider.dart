@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class LoginProvider extends ChangeNotifier {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
+  final TextEditingController usernameController =
+  TextEditingController(text: 'admin@scm.com');
+  final TextEditingController passwordController =
+  TextEditingController(text: 'admin123');
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 

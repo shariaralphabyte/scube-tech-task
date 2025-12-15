@@ -30,8 +30,17 @@ class _DashboardScreenState extends State<DashboardScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
+
+  Future<void> _loadData() async {
+    final energyProvider = context.read<EnergyProvider>();
+    await energyProvider.fetchTodayData();
+  }
+
 
   @override
   void dispose() {
@@ -39,12 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.dispose();
   }
 
-  Future<void> _loadData() async {
-    final energyProvider = context.read<EnergyProvider>();
-    await Future.wait([
-      energyProvider.fetchTodayData(),
-    ]);
-  }
+
 
   @override
   Widget build(BuildContext context) {
