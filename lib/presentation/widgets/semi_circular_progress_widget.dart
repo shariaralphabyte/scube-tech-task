@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+// ------------------------ SEMI-CIRCULAR WIDGET (ALMOST CIRCLE) ------------------------
+
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 
 class SemiCircularProgressWidget extends StatelessWidget {
@@ -18,7 +22,7 @@ class SemiCircularProgressWidget extends StatelessWidget {
     this.maxValue = 100,
     required this.unit,
     this.width = 200,
-    this.height = 100,
+    this.height = 200,
     this.strokeWidth = 20,
     this.progressColor = AppTheme.circuleColor,
     this.backgroundColor = AppTheme.white,
@@ -26,7 +30,7 @@ class SemiCircularProgressWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final percentage = (value / maxValue).clamp(0.0, 1.0); // FIXED
+    final percentage = (value / maxValue).clamp(0.0, 1.0);
 
     return SizedBox(
       width: width,
@@ -35,7 +39,7 @@ class SemiCircularProgressWidget extends StatelessWidget {
         children: [
           CustomPaint(
             size: Size(width, height),
-            painter: _SemiCircularProgressPainter(
+            painter: _AlmostCircularPainter(
               percentage: percentage,
               strokeWidth: strokeWidth,
               progressColor: progressColor,
@@ -43,14 +47,13 @@ class SemiCircularProgressWidget extends StatelessWidget {
             ),
           ),
           Align(
-            alignment: const Alignment(0, 0.3), // Move text slightly up
+            alignment: const Alignment(0, 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 20,),
                 Text(
                   value.toStringAsFixed(2),
-                  style: AppTheme.largeValue.copyWith(fontSize: 16),
+                  style: AppTheme.largeValue.copyWith(fontSize: 18),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -66,13 +69,13 @@ class SemiCircularProgressWidget extends StatelessWidget {
   }
 }
 
-class _SemiCircularProgressPainter extends CustomPainter {
+class _AlmostCircularPainter extends CustomPainter {
   final double percentage;
   final double strokeWidth;
   final Color progressColor;
   final Color backgroundColor;
 
-  _SemiCircularProgressPainter({
+  _AlmostCircularPainter({
     required this.percentage,
     required this.strokeWidth,
     required this.progressColor,
@@ -81,10 +84,13 @@ class _SemiCircularProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height);
+    final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    // Draw background arc (semi-circle)
+    final gap = math.pi * 0.3; // 10% gap
+    final startAngle = -math.pi /  gap ; // rotate so gap is at bottom
+    final sweepAngle = 2 * math.pi - gap;       // almost full circle
+
     final backgroundPaint = Paint()
       ..color = backgroundColor
       ..style = PaintingStyle.stroke
@@ -93,25 +99,22 @@ class _SemiCircularProgressPainter extends CustomPainter {
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      math.pi,          // Start from left
-      math.pi,          // Sweep 180 degrees
+      startAngle,
+      sweepAngle,
       false,
       backgroundPaint,
     );
 
-    // Draw progress arc
     final progressPaint = Paint()
       ..color = progressColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
 
-    final sweepAngle = math.pi * percentage; // Half circle progress
-
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      math.pi,          // Start from left
-      sweepAngle,
+      startAngle,
+      sweepAngle * percentage,
       false,
       progressPaint,
     );

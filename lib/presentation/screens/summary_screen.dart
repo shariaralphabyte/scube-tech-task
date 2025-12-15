@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/utils.dart';
 import '../providers/energy_provider.dart';
 import '../widgets/circular_progress_widget.dart';
 import '../widgets/energy_chart_card.dart';
 import '../widgets/semi_circular_progress_widget.dart';
 import 'custom_date_screen.dart';
+import 'dart:math' as math;
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({super.key});
@@ -19,6 +21,7 @@ class _SummaryScreenState extends State<SummaryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _showTodayData = true;
+  bool _isExpanded = false; // Revenue card expanded state
 
   @override
   void initState() {
@@ -65,9 +68,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                 ),
               ],
             ),
-            onPressed: () {
-              // Handle notifications
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -76,28 +77,20 @@ class _SummaryScreenState extends State<SummaryScreen>
         child: Stack(
           children: [
             Positioned.fill(
-              top: 60, // Push down to allow overlap
+              top: 60,
               child: Container(
-
                 padding: const EdgeInsets.only(top: 40),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color:Colors.grey,
-                    width: 2,
-                  ),
+                  border: Border.all(color: Colors.grey, width: 2),
                 ),
                 child: TabBarView(
                   controller: _tabController,
-                  children: [
-                    _buildDataView(),
-                    _buildRevenueView(),
-                  ],
+                  children: [_buildDataView(), _buildRevenueView()],
                 ),
               ),
             ),
-
             Positioned(
               top: 20,
               left: 16,
@@ -136,18 +129,11 @@ class _SummaryScreenState extends State<SummaryScreen>
           ],
         ),
       ),
-
-
-
     );
   }
 
-  Widget _buildTab({
-    required String title,
-    required int index,
-  }) {
+  Widget _buildTab({required String title, required int index}) {
     final bool isSelected = _tabController.index == index;
-
     return Tab(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -159,9 +145,7 @@ class _SummaryScreenState extends State<SummaryScreen>
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: isSelected
-                  ? AppTheme.primaryBlue
-                  : Colors.grey,
+              color: isSelected ? AppTheme.primaryBlue : Colors.grey,
             ),
           ),
         ],
@@ -193,9 +177,7 @@ class _SummaryScreenState extends State<SummaryScreen>
               width: 6,
               height: 6,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? AppTheme.primaryBlue
-                    : Colors.transparent,
+                color: isSelected ? AppTheme.primaryBlue : Colors.transparent,
                 shape: BoxShape.circle,
               ),
             ),
@@ -204,7 +186,6 @@ class _SummaryScreenState extends State<SummaryScreen>
       ),
     );
   }
-
 
   Widget _buildDataView() {
     return Consumer<EnergyProvider>(
@@ -225,7 +206,6 @@ class _SummaryScreenState extends State<SummaryScreen>
             child: Column(
               children: [
                 const SizedBox(height: 16),
-                // Circular Progress
                 CircularProgressWidget(
                   value: data.energyPerSqft,
                   maxValue: 1,
@@ -233,15 +213,13 @@ class _SummaryScreenState extends State<SummaryScreen>
                   size: 160,
                 ),
                 const SizedBox(height: 24),
-                // Today / Custom Date Toggle
                 _buildDataToggle(),
                 const SizedBox(height: 16),
-                // Energy Chart
                 EnergyChartCard(
                   totalPower: data.totalPower,
                   dataSources: data.dataSources,
                 ),
-                const SizedBox(height: 80), // Space for FAB
+                const SizedBox(height: 80),
               ],
             ),
           ),
@@ -262,7 +240,6 @@ class _SummaryScreenState extends State<SummaryScreen>
           return _buildNoDataView();
         }
 
-        // Calculate total revenue
         final totalRevenue = data.dataSources.fold<double>(
           0,
           (sum, source) => sum + source.cost,
@@ -275,75 +252,116 @@ class _SummaryScreenState extends State<SummaryScreen>
             child: Column(
               children: [
                 const SizedBox(height: 16),
-                // Revenue Display
                 SemiCircularProgressWidget(
                   value: totalRevenue / 100000,
                   maxValue: 1,
                   unit: '৳',
                   width: 160,
-                  height: 80,
+                  height: 160,
+                  strokeWidth: 14,
                 ),
-
                 const SizedBox(height: 16),
-                // Revenue breakdown
-                Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Revenue Breakdown',
-                          style: AppTheme.screenTitle,
+                // Expandable card
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppTheme.textGray),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      // Header
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _isExpanded = !_isExpanded;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Data & Cost Info',
+                                style: AppTheme.screenTitle,
+                              ),
+                              Icon(
+                                _isExpanded
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
+                                color: AppTheme.primaryBlue,
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 16),
-                        ...data.dataSources.map((source) {
-                          final color = Color(int.parse(source.color));
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppTheme.veryLightBlue,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: color,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        source.name,
-                                        style: AppTheme.bodyText.copyWith(
-                                          fontWeight: FontWeight.w600,
+                      ),
+                      // Expandable list
+                      if (_isExpanded)
+                        Column(
+                          children: data.dataSources.map((source) {
+                            final color = Color(int.parse(source.color));
+                            return Container(
+                              margin: const EdgeInsets.only(
+                                bottom: 12,
+                                left: 12,
+                                right: 12,
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppTheme.textGray),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Data 1',
+                                              style: AppTheme.bodyText.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Text(
+                                              ': ${NumberUtils.formatNumber(source.data)} (${NumberUtils.formatPercentage(source.percentage)})',
+                                              style: AppTheme.dataValue
+                                                  .copyWith(fontSize: 18),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '৳ ${source.cost.toStringAsFixed(0)}',
-                                        style: AppTheme.dataValue.copyWith(
-                                          fontSize: 18,
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Cost ',
+                                              style: AppTheme.bodyText.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Text(
+                                              ': ${source.cost.toStringAsFixed(0)}',
+                                              style: AppTheme.dataValue
+                                                  .copyWith(fontSize: 18),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 80),
@@ -366,30 +384,20 @@ class _SummaryScreenState extends State<SummaryScreen>
       child: Row(
         children: [
           Expanded(
-            child: _buildToggleButton(
-              'Today Data',
-              _showTodayData,
-              () {
-                setState(() {
-                  _showTodayData = true;
-                });
-                context.read<EnergyProvider>().toggleDataView(true);
-              },
-            ),
+            child: _buildToggleButton('Today Data', _showTodayData, () {
+              setState(() {
+                _showTodayData = true;
+              });
+              context.read<EnergyProvider>().toggleDataView(true);
+            }),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _buildToggleButton(
-              'Custom Date Data',
-              !_showTodayData,
-              () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const CustomDateScreen(),
-                  ),
-                );
-              },
-            ),
+            child: _buildToggleButton('Custom Date Data', !_showTodayData, () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CustomDateScreen()),
+              );
+            }),
           ),
         ],
       ),
