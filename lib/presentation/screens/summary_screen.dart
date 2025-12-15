@@ -97,7 +97,6 @@ class _SummaryScreenState extends State<SummaryScreen>
               ),
             ),
 
-            /// Top Layer (TabBar)
             Positioned(
               top: 20,
               left: 16,

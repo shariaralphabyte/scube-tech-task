@@ -17,15 +17,19 @@ class EnergyChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppTheme.textGray),
+        borderRadius: BorderRadius.circular(12),
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
                   title ?? 'Energy Chart',
@@ -33,7 +37,7 @@ class EnergyChartCard extends StatelessWidget {
                 ),
                 Text(
                   '${totalPower.toStringAsFixed(2)} kw',
-                  style: AppTheme.dataValue,
+                  style: AppTheme.largeValue,
                 ),
               ],
             ),
@@ -52,46 +56,48 @@ class EnergyChartCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.veryLightBlue,
+
+        border: Border.all(color: AppTheme.textLight),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.lightBlue),
       ),
       child: Row(
         children: [
-          Container(
-            width: 8,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(4),
-            ),
+          Column(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              SizedBox(height: 5,),
+              Text(
+                source.name,
+                style: AppTheme.bodyText.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
+          SizedBox(
+            height: 40,
+            child: VerticalDivider(
+              thickness: 1.5,
+              width: 24,
+              color: Colors.grey.withOpacity(0.4),
+            ),
+          ),          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      source.name,
-                      style: AppTheme.bodyText.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Data',
-                      style: AppTheme.smallText,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Cost',
+                      'Data ',
                       style: AppTheme.smallText,
                     ),
                     Text(
@@ -100,16 +106,22 @@ class EnergyChartCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 4),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const SizedBox(),
+                    Text(
+                      'Cost ',
+                      style: AppTheme.smallText,
+                    ),
                     Text(
                       ': ${NumberUtils.formatCurrency(source.cost)} ৳',
                       style: AppTheme.bodyText,
                     ),
                   ],
                 ),
+
               ],
             ),
           ),
